@@ -1,11 +1,11 @@
 # TITULO DEL DESIGN DOC
 Link: [Link a este design doc](#)
 
-Author(s): Charlie L
+Author(s): Ilse Machado, Ana Quinonez
 
 Status: [Draft, Ready for review, In Review, Reviewed]
 
-Ultima actualización: YYYY-MM-DD
+Ultima actualización: 2025-03-06
 
 ## Contenido
 - Goals
@@ -27,35 +27,26 @@ Ultima actualización: YYYY-MM-DD
 - [Otro link](#)
 
 ## Objetivo
-Una aplicación web que transfiera playlists de Spotify a YouTube Music
-
-Actualmente, ninguna app ofrece una forma de transferir playlists desde una plataforma a la otra
+Una aplicación que permita al usuario identificar los requisitos migratorios para su viaje, y tipo de divisa
+con base a su nacionalidad.
 
 ## Goals
-- Transferir playlists de Spotify a YouTube Music
-- Ofrecer opciones para elegir el reemplazo de una canción si no se encuentra el match
-## Non-Goals
-- Transferir playlists de YouTube Music a Spotify
-- Mantener en sincronía ambas playlist
+- Desplegar los permisos y/o requisitos necesarios para el ingreso a un pais extrangero 
+- Direccionar a los sitos correspondientes para su  tramite
+- Desplegar la divisa del lugar de destino
+## Non-Goals - Pendiente
+- Que se encuentre la informacion de todos los paises del mundo 
 
 ## Background
-Hace poco me cambié de Spotify a YouTube Music, y no pude transferir mis playlists porque ambas apps no ofrecen herramientas para ello
-
-Hay sitios web que ofrecen este feature, pero mi segunda intención es aprender a usar las APIs de YT Music y Spotify
+Es comun que un viajero cuando viaja de manera internacional no tiene la certeza de los requisitos de visado  que son indispensables para
+el ingreso a ese pais, igualmente desconoce la divisa que va a utilizar, donde conseguirla y requisitos sanitarios 
 
 ## Overview
-Necesitamos una API que convierta una playlist de un usuario de Spotify a una playlist de YouTube Music
+Necesitaremos una API que contenga permisos, visados, divisa y vacunas por pais que sean necesarios para poder entrar al mismo, ademas 
+contendra los links de los sitios oficiales de los departamentos de migracion para mas informacion y tramite. 
 
-Cada playlist tiene un id, y podemos consultar todas sus canciones a través de la API oficial usando ese id
-
-Spotify ofrece una [API](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-list-users-playlists) que podemos usar para obtener:
-- Obtener las playlists de un user
-- Obtener las canciones de esa playlist
-
-Por el otro, YouTube Music no ofrece una **API pública**, pero existe una [API no oficial](https://ytmusicapi.readthedocs.io/en/latest/) que provee los métodos necesarios para crear una playlist, los cuales son:
-- Crear playlist
-- Buscar canción
-- Añadir canción a la playlist
+-  Se accedera a la API con id de nacionalidades a traves de una lista 
+-  Con la seleccion del pais de destino desplega la informacion organizada
 
 ## Detailed Design
 
