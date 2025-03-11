@@ -1,4 +1,4 @@
-# TITULO DEL DESIGN DOC
+# TravelMate
 Link: [Link a este design doc](#)
 
 Author(s): Ilse Machado, Ana Quinonez
@@ -53,91 +53,74 @@ contendra los links de los sitios oficiales de los departamentos de migracion pa
 ## Solución 1
 
 ## Spotify
-### Obtener playlist del usuario
-A través del endpoint */users/{user_id}/playlists* podemos obtener todas las playlist del usuario
-Cuando el user seleccione una playlist, guardamos el ID
 
-### Obtener canciones de la playlist
-Con la plalist ID, a través del endpoint */playlists/{playlist_id}/tracks* podemos obtener todas las canciones
-El endpoint regresa un resultado con la siguiente forma:
+## **🛠️ Arquitectura de la Solución**
+
+### **🖥️ Tecnologías y Herramientas**
+- **Backend:** Flask (Python) 
+- **Base de Datos:**  SQLite
+- **Frontend:** Telegram
+- **APIs Externas:**
+  - **Requisitos migratorios:** IATA Travel Centre, Sherpa API (Revision si hay algo abierto, o construirla manualmente)
+  - **Divisas:** Open Exchange Rates, XE Currency API
+  - **Vacunas:** WHO (Organización Mundial de la Salud)
+
+---
+
+## **🔄 Flujo de Funcionamiento**
+1. **El usuario ingresa su nacionalidad** (selección en dropdown o detección automática).
+2. **Selecciona el país de destino** desde una lista desplegable o búsqueda.
+3. **El sistema consulta la API** y obtiene los siguientes datos:
+   - **Requisitos de visado** según la nacionalidad.
+   - **Vacunas obligatorias o recomendadas**.
+   - **Divisa del país y tasa de cambio actual**.
+   - **Enlaces oficiales** para más información y trámites.
+4. **La información se despliega** de manera clara y organizada.
+5. **El usuario puede acceder a enlaces directos** para trámites migratorios.
+
+---
+
+##  Módulos Clave
+
+###  API de Datos Migratorios
+- Endpoint:  
+``` GET /api/requisitos?origen={pais_origen}&destino={pais_destino} ```
+
+- Ejemplo de Respuesta JSON:
 ```json
 {
-  "href": "https://api.spotify.com/v1/me/shows?offset=0&limit=20\n",
-  "items": [
-    {}
-  ],
-  "limit": 20,
-  "next": "https://api.spotify.com/v1/me/shows?offset=1&limit=1",
-  "offset": 0,
-  "previous": "https://api.spotify.com/v1/me/shows?offset=1&limit=1",
-  "total": 4
+  "pais_destino": "Canadá",
+  "visa_requerida": true,
+  "tipo_visa": "Turista - eTA",
+  "enlace_tramite": "https://www.canada.ca/en/immigration",
+  "vacunas_requeridas": ["Fiebre Amarilla"],
+  "moneda": "Dólar Canadiense",
+  "tipo_cambio": "1 CAD = 13.50 MXN"
 }
 ```
-Las canciones están en el campo **items**, la cual es una lista de objetos que representan a las canciones
-
-## YouTube Music
-YouTube Music no cuenta con una API oficial. Pero existe una librería hecha en Python que provee acceso a esta API.
-
-[Librería](https://ytmusicapi.readthedocs.io/en/latest/)
-
-### Crear playlist
-Podemos crear una playlist usando la siguiente función de la librería
-
-```python
-YTMusic.create_playlist(title: str, description: str, privacy_status: str = 'PRIVATE', video_ids: List[T] = None, source_playlist: str = None) → Union[str, Dict[KT, VT]]
-```
-
-### Buscar canciones de Spotify en YouTube Music
-Podemos usar la función de search para buscar cada canción
-Esto significa que por *n canciones*, se tienen que hacer *n llamadas*
-
-```python
-# Snippet
-YTMusic.search(query: str, filter: str = None, scope: str = None, limit: int = 20, ignore_spelling: bool = False) → List[Dict[KT, VT]]
-```
-
-```python
-# Ejemplo
-youtubeSongs = []
-for item in canciones:
-    # crear el query de la canción
-    cancion = item['title'] + " " + item['artist'] + " " + item['album']
-    # buscar la canción y agregar el primer resultado
-    youtubeSongs.append(
-        Songs.YTMusic.search(
-        query: cancion,
-        filter: "songs",
-        limit: 20,
-        ignore_spelling: True)[0]
-    )
-```
-
-### Guardar canción en playlist
-
-```python
-def getId(song):
-    return song['id']
-
-youtubeSongsIds = map(addition, youtubeSongs)
-
-YTMusic.add_playlist_items(playlistId: playlistId, videoIds: youtubeSongsIds, source_playlist: None, duplicates: False)
-```
-
-## Solucion 2
-Podemos reusar los mismos métodos de la solución 1, con los siguientes cambios
-
-### Buscar canciones de Spotify en YouTube Music
-En lugar de agregar la primer opción de la búsqueda inmediatamente, podemos ofrecer todas las opciones al user para que elija cual es el mejor match de la canción
-
-Esto implica ofrecer una UI donde:
-- Se muestren todas las opciones
-- Se puedan reproducir cada opción para que el user elija cual es la adecuada para la playlist
-
-Esto necesitaría otro design doc enfocado a la UI si se elige esta solución
+🖥️ UI/UX - Interfaz de Usuario
+** Pantalla principal: Selección de nacionalidad y país de destino.
+** Pantalla de resultados:
+- Requisitos migratorios.
+- Vacunas recomendadas.
+- Divisa y conversión.
+- Botón de acceso a enlaces oficiales.
 
 ## Consideraciones
-- La librería solo esta en Python. Tal vez podemos entender como funciona para implementarla por nuestra cuenta en otro lenguaje si es necesario
+** Consideraciones Adicionales
+- Escalabilidad: Modularización para añadir más países en el futuro.
+- Multilenguaje: Soporte para español e inglés.
+- Actualización de Datos: Consulta periódica a APIs externas para mantener información actualizada.
 
 ## Métricas
-- Checar Web Vitals para entender si la app carga de forma adecuada y tiene buen performance
-- Validar cuantos usuarios terminan el proceso de migración de una playlist
+1 Web Vitals - Rendimiento
+Largest Contentful Paint (LCP) – Tiempo en mostrar información de requisitos migratorios.
+First Input Delay (FID) – Tiempo de respuesta tras elegir nacionalidad y destino.
+Cumulative Layout Shift (CLS) – Estabilidad de la interfaz al cargar datos.
+2 Conversión de Usuarios en la Consulta de Requisitos
+Usuarios que inician una consulta vs. los que la completan.
+Tiempo promedio para completar la búsqueda de requisitos.
+Puntos de abandono en el proceso de consulta.
+3  Seguimiento de Clics en Enlaces de Trámite
+Usuarios que hacen clic en los enlaces de trámites oficiales.
+Tasa de conversión: usuarios que ven los requisitos vs. los que acceden a trámites.
